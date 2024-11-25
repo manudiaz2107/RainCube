@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones RainCube</title>
+    <link rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #00ffcc;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 255, 204, 0.6);
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #ff9900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        footer p {
+            font-size: 18px;
+            color: #00ffcc;
+            margin-top: 20px;
+        }
+
+        strong {
+            color: #ffcc00;
+        }
+
+        /* Animación para desvanecer el contenido */
+        .section {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #00b39f;
+            color: white;
+            border: 2px solid #00b39f;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #00ffcc;
+            transform: scale(1.1);
+        }
+
+        #copy a {
+            color: #ff9900;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        #copy a:hover {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>INSTRUCCIONES RAINCUBE</h1>
+
+        <section class="section">
+            <h2>🎯 OBJETIVO:</h2>
+            <p>¡Bienvenido a <strong>RainCube</strong>! Tu objetivo es recoger los cubos que caen para sumar puntos y alcanzar la mayor puntuación posible. 
+                Pero ten cuidado, algunos cubos pueden restar puntos o incluso terminar con el juego. La dificultad va aumentando a medida que recolectas más puntos.
+                <br>¿Serás capaz de superar tu propio récord?<br>
+                Aquí tienes las reglas y lo que necesitas saber para jugar:
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>🕹️ MOVIMIENTO:</h2>
+            <p>Controla al jugador haciendo <strong>click</strong> en la pantalla. ¡Más fácil, imposible!</p>
+        </section>
+
+        <section class="section">
+            <h2>🌧️ LLUVIA DE CUBOS:</h2>
+            <p>Los cubos caen aleatoriamente del cielo. Existen diferentes tipos de cubos con efectos diferentes:</p>
+            <ul>
+                <li>🟩 **Verde**: Suma 1 punto.</li>
+                <li>🟥 **Rojo**: Resta 5 puntos.</li>
+                <li>🟨 **Dorado**: Suma 3 puntos.</li>
+                <li>⬛ **Negro**: Termina el juego.</li>
+            </ul>
+            <p><strong>Pero esto no es todo, los puntos irán variando según vayas avanzando</strong></p>
+        </section>
+
+        <section class="section">
+            <h2>⚡ COMBO DE CUBOS:</h2>
+            <p>¡Recoge cubos seguidos sin fallar! En la parte superior derecha se mostrará tu combo, pero ojo, si tocas
+                un cubo rojo 🟥, ¡el combo se reiniciará! Intenta alcanzar el combo más alto posible.</p>
+        </section>
+
+        <section class="section">
+            <h2>💡 DIFICULTAD PROGRESIVA:</h2>
+            <p>A medida que aumentan tus puntos, la cantidad de cubos que caen también aumenta. ¡Ten cuidado!</p>
+        </section>
+
+        <section class="section">
+            <h2>❌ ¿CÓMO PERDER?</h2>
+            <p>Si el cubo negro ⬛ toca al jugador, o si tus puntos caen por debajo de cero al tocar demasiados cubos
+                rojos 🟥, el juego terminará. ¡No dejes que eso pase!</p>
+        </section>
+
+        <section class="section">
+            <h2>🔧 RECOMENDACIONES:</h2>
+            <p>Para una mejor experiencia de juego:</p>
+            <ul>
+                <li>1. Pulsa <strong>F11</strong> para pantalla completa.</li>
+                <li>2. Luego, presiona <strong>F5</strong> para recargar y optimizar.</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>¡Gracias por jugar y que la lluvia de cubos comience! 🌧️</p>
+        </footer>
+
+        <button onclick="window.location.href='raincube.html'">Volver al juego</button>
+
+        <div id="copy">
+            <p>&copy; 2024 <a href="https://github.com/manudiaz2107" target="_blank">@manudiaz2107</a>. Todos los
+                derechos reservados.</p>
+        </div>
+    </div>
+</body>
+
+</html>

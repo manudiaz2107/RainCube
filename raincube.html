@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RainCube</title>
+  <style>
+    /* ------------------- Estilos generales ------------------- */
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #111;
+      color: #00ffc6;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    #game-container {
+      position: relative;
+      right: 40px;
+      width: 40vw;
+      height: 80vh;
+      background: linear-gradient(145deg, #111, #222);
+      overflow: hidden;
+      border: 3px solid #00ffc6;
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.7);
+    }
+
+    #player {
+      width: 50px;
+      height: 50px;
+      background-color: #00ffc6;
+      position: absolute;
+      bottom: 0;
+      transition: left 0.1s ease;
+    }
+
+    /* Panel de puntuacion y combo */
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: #00ffc6;
+    }
+
+    #combo {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      color: #33b8ff;
+    }
+
+    /* Botón de inicio */
+    #start-button {
+      position: absolute;
+      bottom: 10px;
+      left: 19%;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #00ffff, #ff8c00);
+      /* Efecto de gradiente */
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 4rem;
+      text-transform: uppercase;
+      border-radius: 15px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      outline: none;
+      margin-bottom: 42%;
+    }
+
+    #start-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+    }
+
+    #manual {
+      position: absolute;
+      bottom: 10px;
+      left: 31%;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #00ffff, #ff8c00);
+      /* Efecto de gradiente */
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      border-radius: 15px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      outline: none;
+      margin-bottom: 58%;
+    }
+    #manual:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Leyenda a la izquierda */
+    #legend {
+      position: relative;
+      right: 30px;
+      width: 110px;
+      background-color: #222;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.7);
+    }
+
+    #legend div {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    /* ------------------- Animaciones ------------------- */
+
+    /* Efecto de parpadeo para objetos recogidos */
+    @keyframes blink {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Efecto de explosión al perder (No usado)*/
+    @keyframes explosion {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    /* ------------------- Ventana emergente MUERTE ------------------- */
+    .modal {
+      display: none;
+      /* Ocultar por defecto */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      /* Fondo semi-transparente */
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: rgb(0, 0, 0);
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      animation: fadeIn 0.5s;
+      animation: shake 0.5s ease-in-out;
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.7);
+    }
+
+    .modal-content h2 {
+      margin: 0 0 15px;
+      color: #ff0000;
+    }
+
+    .modal-content p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      background: #0056b3;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-10px);
+      }
+
+      50% {
+        transform: translateX(10px);
+      }
+
+      75% {
+        transform: translateX(-10px);
+      }
+
+      100% {
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Leyenda explicativa de objetos -->
+  <div id="legend">
+    <div><strong>Objetos:</strong></div>
+    <div>🟩 Verde: Suma 1 punto</div>
+    <div>🟥 Rojo: Resta 5 puntos</div>
+    <div>🟨 Dorado: Suma 3 puntos</div>
+    <div>⬛ Negro: Termina el juego</div>
+  </div>
+
+  <!-- Contenedor del juego -->
+  <div id="game-container">
+    <div id="player"></div>
+    <div id="score">Puntos: 0</div>
+    <div id="combo">Combo: x0</div>
+    <button id="start-button">RainCube</button>
+    <button id="manual" onclick="window.location.href='instrucciones.html'">Instrucciones</button>
+  </div>
+
+  <!-- Música de fondo -->
+  <audio id="background-music" loop>
+    <source src="music/DJVI - Back On Track.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Ventana emergente muerte -->
+  <div id="gameOverModal" class="modal">
+    <div class="modal-content">
+      <h2>¡Juego Terminado!</h2>
+      <p id="combofinal"></p>
+      <p id="finalScore"></p>
+      <button id="restartButton">Reiniciar</button>
+    </div>
+  </div>
+
+  <script>
+    // ------------------- Variables globales -------------------
+    const legend = document.getElementById("legend");
+    const player = document.getElementById("player");
+    const scoreDisplay = document.getElementById("score");
+    const comboDisplay = document.getElementById("combo");
+    const startButton = document.getElementById("start-button");
+    const manual = document.getElementById("manual");
+    const gameContainer = document.getElementById("game-container");
+    const backgroundMusic = document.getElementById("background-music"); //musica
+
+    let playerX = 0;
+    let direction = 1;
+    let score = 0;
+    let combo = 0;
+    let highestScore = localStorage.getItem("highestScore") || 0;
+    let gameInterval, objectInterval;
+    let fallingObjects = [];
+    let gameWidth = gameContainer.clientWidth;
+    let objectFallSpeed = 5;
+    let creationInterval = 1000; // Intervalo inicial para crear objetos
+    let greenScore = 1;
+    let redScore = 5;
+    let goldScore = 3;
+    let gameRunning = false;
+
+    // ------------------- Movimiento del jugador -------------------
+    function movePlayer() {
+      playerX += direction * 5; // Movimiento en la dirección actual
+      if (playerX < 0) playerX = 0; // Evita salir por el lado izquierdo
+      if (playerX > gameWidth - 50) playerX = gameWidth - 50; // Evita salir por el lado derecho
+      player.style.left = playerX + "px"; // Actualiza posicion en la pantalla
+    }
+
+    // ------------------- Cargar sonidos -------------------
+    const soundEaster = new Audio("music/easterEgg.mp3"); // Sonido al easterEgg
+    const soundCollect = new Audio("music/wincube.mp3"); // Sonido al recoger
+    const soundFail = new Audio("music/damage.mp3"); // Sonido al fallar
+    const soundGameOver = new Audio("music/lose.mp3"); // Sonido al perder
+
+    // ------------------- Función para crear los objetos que caen -------------------
+    function createFallingObject() {
+      const object = document.createElement("div");
+      const size = Math.random() * 40 + 20; // Tamaño aleatorio entre 20 y 60 pixeles
+      object.style.width = size + "px"; // Aplica el ancho
+      object.style.height = size + "px"; // Posición absoluta dentro del contenedor
+      object.style.position = "absolute";
+      object.style.top = "0px";
+      object.style.left = Math.random() * (gameWidth - size) + "px";
+
+      // Probabilidad para asignar tipo de objeto
+      let objectType = Math.random();
+
+      // Ajuste de probabilidades: 50% negro, 20% verde, 17% rojo, 12% dorado, 1% easterEgg
+      if (objectType < 0.5) {
+        object.style.backgroundColor = "rgb(0, 0, 0)";
+        object.dataset.type = "black"; // Tipo negro
+      } else if (objectType < 0.7) {
+        object.style.backgroundColor = "rgb(0, 255, 0)";
+        object.dataset.type = "green"; // Tipo verde
+      } else if (objectType < 0.87) {
+        object.style.backgroundColor = "rgb(255, 0, 0)";
+        object.dataset.type = "red"; // Tipo rojo
+      } else if (objectType < 0.99) {
+        object.style.backgroundColor = "rgb(255, 215, 0)";
+        object.dataset.type = "gold"; // Tipo dorado
+      } else {
+        object.style.backgroundImage =
+          "url('https://media.tenor.com/YlI0Hs9CGiEAAAAi/cat.gif')";
+        object.style.backgroundSize = "cover"; // Para asegurar que el GIF se ajuste al tamaño del objeto
+        object.dataset.type = "easterEgg"; // Tipo morado
+      }
+
+      gameContainer.appendChild(object);
+      fallingObjects.push({
+        element: object,
+        yPos: 0,
+        size: size,
+        type: object.dataset.type,
+      });
+    }
+
+    // ------------------- Función para mover los objetos que caen -------------------
+    function moveFallingObjects() {
+      fallingObjects.forEach((obj, index) => {
+        obj.yPos += objectFallSpeed; // Mueve el objeto hacia abajo
+        obj.element.style.top = obj.yPos + "px";
+
+        // Comprobar si el objeto esta cerca del jugador
+        if (
+          obj.yPos + obj.size >= gameContainer.clientHeight - 50 &&  //Borde inferior
+          obj.yPos <= gameContainer.clientHeight - 50
+        ) {
+          // Comprobar si el objeto toca al jugador horizontalmente
+          if (
+            playerX < obj.element.offsetLeft + obj.size &&  //borde izquierdo
+            playerX + 50 > obj.element.offsetLeft //borde derecho
+          ) {
+            // Logica según el tipo de objeto
+            if (obj.type === "green") {
+              soundCollect.play(); //sonido
+              score += greenScore;
+              combo++;
+              scoreDisplay.textContent = "Puntos: " + score;
+              comboDisplay.textContent = "Combo: x" + combo;
+            } else if (obj.type === "red") {
+              soundFail.play();
+              score -= redScore;
+              combo = 0; // Resetea el combo al fallar
+              scoreDisplay.textContent = "Puntos: " + score;
+              comboDisplay.textContent = "Combo: x0";
+              if (score < 0) {
+                backgroundMusic.pause();
+                soundGameOver.play();
+                endGame();
+              }
+            } else if (obj.type === "gold") {
+              soundCollect.play();
+              score += goldScore;
+              combo++;
+              scoreDisplay.textContent = "Puntos: " + score;
+              comboDisplay.textContent = "Combo: x" + combo;
+            } else if (obj.type == "easterEgg") {
+              soundEaster.play();
+              score += 20;
+              combo++;
+              scoreDisplay.textContent = "Puntos: " + score;
+              comboDisplay.textContent = "Combo: x" + combo;
+            } else if (obj.type === "black") {
+              soundFail.play();
+              backgroundMusic.pause(); // Pausa la música
+              soundGameOver.play(); //sonido lose
+              endGame(); // Termina el juego si toca un cuadrado negro
+            }
+
+            obj.element.style.animation = "blink 0.3s"; // Animación de comer cubos
+            setTimeout(() => {
+              obj.element.remove();
+            }, 300);
+
+            fallingObjects.splice(index, 1);
+          }
+        }
+
+        if (obj.yPos > gameContainer.clientHeight) {
+          obj.element.remove();
+          fallingObjects.splice(index, 1);
+        }
+      });
+    }
+
+    // ------------------- Función para comenzar el juego -------------------
+    function startGame() {
+      score = 0;
+      combo = 0;
+      objectFallSpeed = 5; // Restablecer velocidad de caída
+      creationInterval = 1000; // Restablecer intervalo de creación
+      let greenScore = 1;
+      let redScore = 5;
+      let goldScore = 3;
+      scoreDisplay.textContent = "Puntos: " + score;
+      comboDisplay.textContent = "Combo: x0";
+      playerX = gameWidth / 2 - 25;
+      direction = 1;
+      fallingObjects = [];
+
+      startButton.style.display = "none";
+      manual.style.display = "none";
+      gameRunning = true;
+
+      // Iniciar la música de fondo
+      backgroundMusic.currentTime = 0; // Reinicia la música al inicio del juego
+      backgroundMusic.play();
+
+      gameInterval = requestAnimationFrame(update);
+      objectInterval = setInterval(createFallingObject, creationInterval);
+    }
+
+    // ------------------- Función para actualizar el juego -------------------
+    function update() {
+      movePlayer();
+      moveFallingObjects();
+
+      // Ajusta la dificultad del juego según la puntuación
+      if (score >= 20 && greenScore !== 2) {
+        greenScore = 2; // Cambiar puntuación de cubos
+        clearInterval(objectInterval);
+        creationInterval = 700; // Reducir intervalo de creación
+        objectInterval = setInterval(createFallingObject, creationInterval);
+
+        legend.innerHTML = legend.innerHTML.replace(
+          "Suma 1 punto", `Suma 2 puntos`
+        );
+      }
+
+      if (score >= 50 && greenScore !== 3 && redScore !== 7 && goldScore !== 5) {
+        greenScore = 3; // Cambiar de nivel
+        redScore = 7;
+        goldScore = 5;
+        clearInterval(objectInterval);
+        creationInterval = 500; // Reducir intervalo de creación de cubos
+        objectInterval = setInterval(createFallingObject, creationInterval);
+
+        legend.innerHTML = legend.innerHTML
+          .replace(`Suma 2 puntos`, `Suma 3 puntos`)
+          .replace("Resta 5 puntos", `Resta 7 puntos`)
+          .replace("Dorado: Suma 3 puntos", `Dorado: Suma 5 puntos`);
+      }
+
+      if(score >=70 && greenScore !== 3 && redScore !== 7 && goldScore !== 5){
+        clearInterval(objectInterval);
+        creationInterval = 200; // Reducir intervalo de creación de cubos
+        objectInterval = setInterval(createFallingObject, creationInterval);
+      }
+
+      if (gameRunning) {
+        gameInterval = requestAnimationFrame(update);
+      }
+    }
+
+    // Función para manejar clic en el contenedor del juego
+    gameContainer.addEventListener("click", () => {
+      direction *= -1;
+    });
+
+    startButton.addEventListener("click", startGame);
+    
+
+    // ------------------- Función para finalizar el juego -------------------
+    function endGame() {
+      gameRunning = false;
+
+      if (score > highestScore) {
+        highestScore = score;
+        localStorage.setItem("highestScore", highestScore);
+      }
+
+      // Mostrar el modal
+      const restartButton = document.getElementById("restartButton");
+      const gameOverModal = document.getElementById("gameOverModal");
+      const finalScoreElement = document.getElementById("finalScore");
+      const combofinalElement = document.getElementById("combofinal");
+
+      gameOverModal.style.display = "flex"; // Mostrar el modal
+      combofinalElement.textContent = "Combo de bloque: " + combo;
+      finalScoreElement.textContent = "Puntuación final: " + score;
+
+      restartButton.addEventListener("click", () => {
+        // Oculta el modal
+        const gameOverModal = document.getElementById("gameOverModal");
+        gameOverModal.style.display = "none";
+        startButton.style.display = "";
+        manual.style.display = "";
+      });
+
+      // Eliminar todos los objetos caídos
+      fallingObjects.forEach((obj) => {
+        obj.element.remove();
+      });
+      fallingObjects = [];
+
+      // Reiniciar la vista y detener los intervalos y animaciones
+      cancelAnimationFrame(gameInterval); //Detiene la animación del juego
+      clearInterval(objectInterval); // Detiene la creación de nuevos objetos
+      backgroundMusic.pause(); // Pausa la música
+    }
+  </script>
+</body>
+
+</html>
